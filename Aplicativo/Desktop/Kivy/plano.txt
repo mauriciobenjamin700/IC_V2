@@ -1,0 +1,23 @@
+1.0 Montar a Interface
+
+1.1 Menu
+1.1.1 Verificar FAMACHA (1.2)
+1.1.2 Sair (Fecha o APP) 
+
+1.2 Tela de Busca Famacha 
+1.2.1 Barra de Navegação (Lugar para o usuário Digitar)
+1.2.2 Confirmar Busca (1.4)
+1.2.3 Voltar (1.1)
+
+1.3 Tela Resultado se existe ou não a imagem
+1.3.1 Resultado se a imagem foi encontrada
+1.3.2 Se encontrado, exibir imagem na tela, se não, Aparecer um icone de aviso de erro
+1.3.3 Botão Continuar teste (1.4)
+1.3.4 Procurar outra imagem em caso de falha (1.2)
+1.3.5 Botão voltar ao inicio (1.1)
+
+1.4 Tela Resultado do teste FAMACHA da imagem Enviada
+1.4.1 Texto Resultado
+1.4.2 Botão de voltar ao inicio (1.1)
+1.4.3 Botão Novo Teste (1.2)
+

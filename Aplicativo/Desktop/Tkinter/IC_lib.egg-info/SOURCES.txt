@@ -1,0 +1,13 @@
+setup.py
+IC_lib.egg-info/PKG-INFO
+IC_lib.egg-info/SOURCES.txt
+IC_lib.egg-info/dependency_links.txt
+IC_lib.egg-info/top_level.txt
+pacote/__init__.py
+pacote/backEnd.py
+pacote/create_model_05.py
+pacote/excel_access_04.py
+pacote/extrac_features_03.py
+pacote/save_result_06.py
+pacote/segmentation_02.py
+pacote/take_img_01.py

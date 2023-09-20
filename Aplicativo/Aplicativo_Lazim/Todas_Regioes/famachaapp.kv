@@ -1,0 +1,75 @@
+#:kivy 1.0.9
+
+
+        
+<Gerenciador>:
+    MenuInicial:
+    
+    TelaPrincipal:
+
+    FileManager:
+
+    Mensagem:
+
+<Mensagem>:
+    name:'Mensagem'
+    title: 'Resultado'
+    on_enter: root.get_label_text()
+    BoxLayout:
+        orientation:'vertical'
+        Label:
+            id: label_text
+            text:''
+        Button:
+            size_hint_y: None
+            height:50
+            text:'Sair'
+            on_release:app.root.current = 'FileManager'
+
+<MenuInicial>:
+    name: 'MenuInicial'
+    BoxLayout:
+        id: Box
+        orientation:'vertical'
+        height:self.minimum_height
+        Button:
+            text:'FAMACHA'
+            font_size:'30'
+            on_release:app.root.current = 'TelaPrincipal'
+        Button:
+            text:'SAIR'
+            font_size:'30'
+            on_release:root.on_botao_sair_pressed()
+
+<TelaPrincipal>:
+    name: 'TelaPrincipal'
+    BoxLayout:
+        orientation:'vertical'
+        Button:
+            text:'Fazer analise'
+            on_release:app.root.current = 'FileManager'
+        
+        Button:
+            text:'Voltar ao inicio'
+            on_release:app.root.current = 'MenuInicial'
+
+<FileManager>:
+    name:'FileManager'
+
+    BoxLayout:
+        orientation:'vertical'
+        FileChooserIconView:
+            id: file_chooser
+            on_selection:root.selection(file_chooser.selection)
+        
+        Button:
+            size_hint_y: None
+            height:50
+            text:'Selecionar'
+            on_press:root.get_file()
+            on_release:app.root.current = 'Mensagem'
+        Button:
+            size_hint_y: None
+            height:50
+            text:'Voltar'
+            on_release:app.root.current = 'TelaPrincipal'

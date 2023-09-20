@@ -1,0 +1,5 @@
+*.log
+/logs/
+config.ini
+logs/*
+.iml
