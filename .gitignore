@@ -5,3 +5,6 @@ logs/*
 .iml
 .weights
 .zip
+.pyc
+.names
+.cfg

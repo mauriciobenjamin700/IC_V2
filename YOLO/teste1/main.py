@@ -2,23 +2,37 @@ import cv2
 import numpy as np
 import os
 import zipfile
-from show import mostrar, blob_imagem,alturaXlargura
+from show import blob_imagem,alturaXlargura
 from work import deteccoes, funcoes_imagem
 from drive import driveFile
 
-yolov4URL = "https://drive.google.com/u/0/uc?id=1kPKs0ZlEK5O_WbbTGSbiI1A3JI8C6UHc&export=download"
 
-driveFile(yolov4URL,"modelo.zip")
+if not os.path.exists("modelo.zip"):
+  """
+  Verifica se o modelo já se encontra no diretório
+  se não se encontra no diretória, então baixa o mesmo do link a baixo
+  se o modelo já estiver baixado, não faz nada
+  """
 
-zip_object = zipfile.ZipFile(file="modelo.zip", mode='r')
-zip_object.extractall('./')
-zip_object.close()
+  yolov4URL = "https://drive.google.com/u/0/uc?id=1kPKs0ZlEK5O_WbbTGSbiI1A3JI8C6UHc&export=download"
 
-print("Terminei de extrair")
+  driveFile(yolov4URL,"modelo.zip")
 
-try:
+  zip_object = zipfile.ZipFile(file="modelo.zip", mode='r')
+  zip_object.extractall('./')
+  zip_object.close()
 
+  print("Terminei de extrair")
+
+
+try:  
+  """
+  Tenta realizar o processamento da imagem, para tanto segue os seguintes passosa
   
+  C
+  
+  
+  """
 
   labelsPath = os.path.sep.join(["cfg", "coco.names"])
 
@@ -45,7 +59,7 @@ try:
   imagePath = os.path.sep.join(['imagens', "cachorros02.jpg"])
 
   imagem = cv2.imread(imagePath)
-  mostrar(imagem)
+
 
 
   net, imagem, layerOutputs = blob_imagem(net, imagem,ln)
@@ -64,16 +78,16 @@ try:
           
   objs = cv2.dnn.NMSBoxes(caixas, confiancas, threshold, threshold_NMS)
 
-  print("Objetos detectados: " + str(len(objs)))
+  print("\nObjetos detectados: " + str(len(objs)))
 
   if len(objs) > 0:
     for i in objs.flatten():
       imagem, x, y, w, h = funcoes_imagem(imagem, i, confiancas, caixas, COLORS, LABELS,IDclasses)
       objeto = imagem[y:y + h, x:x + w]
-      cv2.imshow('Teste',objeto)
-      cv2.destroyAllWindows()
-      
-  mostrar(imagem)
 
+  name_img = os.path.sep.join(["resultados","Teste1.jpg"])
+  print(name_img)
+  #name_img = 'teste1.jpg'
+  cv2.imwrite(name_img, imagem)
 except:
   print("Deu erro")

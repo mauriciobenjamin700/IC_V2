@@ -1,19 +1,19 @@
 import cv2
 import matplotlib.pyplot as plt
 import time
-
+"""
 def mostrar(img):
   fig = plt.gcf()
   fig.set_size_inches(16, 10)
   plt.axis("off")
   plt.imshow(cv2.cvtColor(img, cv2.COLOR_BGR2RGB))
   plt.show()
-  
+"""
 def alturaXlargura(img):
     
     H, W = img.shape[:2]
     
-    print("Altura: " + str(H) + "\nLargura: " + str(W))
+    print("\nAltura: " + str(H) + "\nLargura: " + str(W))
     return H,W
 
 def calcProporcao(img):
@@ -44,6 +44,6 @@ def blob_imagem(net, imagem, ln,mostrar_texto=True):
   termino = time.time()
 
   if mostrar_texto:
-    print("YOLO levou {:.2f} segundos".format(termino - inicio))
+    print("\nYOLO levou {:.2f} segundos\n".format(termino - inicio))
 
   return net, imagem, layerOutputs
