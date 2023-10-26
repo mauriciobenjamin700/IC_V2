@@ -1,0 +1,7 @@
+path: 'datasets/object_detect'
+train: 'train/'
+val: 'valid/'
+test: 'test/'
+
+nc: 1
+names: [EYE_MEMBRANE]
