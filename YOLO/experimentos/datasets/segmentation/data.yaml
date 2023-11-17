@@ -1,0 +1,13 @@
+train: ../train/images
+val: ../valid/images
+test: ../test/images
+
+nc: 3
+names: ['- goat_eyes_detection - 2023-10-18 12-22pm', 'goat_eye_membrane', 'object']
+
+roboflow:
+  workspace: ic-yppwu
+  project: goat_eye_membrane_segmentation
+  version: 1
+  license: CC BY 4.0
+  url: https://universe.roboflow.com/ic-yppwu/goat_eye_membrane_segmentation/dataset/1

@@ -1,0 +1,13 @@
+train: ../train/images
+val: ../valid/images
+test: ../test/images
+
+nc: 1
+names: ['eye_membrane']
+
+roboflow:
+  workspace: ic-yppwu
+  project: goat_eyes_detection
+  version: 3
+  license: CC BY 4.0
+  url: https://universe.roboflow.com/ic-yppwu/goat_eyes_detection/dataset/3
