@@ -21,5 +21,9 @@ f = Famacha()
 names = glob(os.path.join(dados,'*.jpg'))
 
 for name in names:
+    print(f"Imagem: {name}\nBoxes -> {f.snip_img(name,0.5)}")
+"""
+for name in names:
     cv2.imwrite(os.path.join(saida,os.path.basename(name)) ,f.segmen_img(name,0.5))
     print(os.path.basename(name))
+"""
