@@ -8,52 +8,69 @@ class Famacha:
 
     
     def __init__(self, path_model='model_segment/weights/best.pt') -> None:
-        self.model = result = YOLO(path_model)
+        self.model = YOLO(path_model)
         
     def predict_dir_image(self, list_fname,conf=0.5):
-        results = self.model.predict(list_fname,conf=conf)
-
-        xyxys = []
-        confidences = []
-        classes_id = []
-        for result in results:
-            boxes = result.boxes.cpu().numpy()
+        results = self.model.predict(list_fname,conf=conf,boxes=False,max_det=2)
+        
+        json = {}
+        
+        for idx,result in enumerate(results):
             
-            xyxys.append(boxes.xyxy)
-            confidences.append(boxes.conf)
-            classes_id.append(boxes.cls)
+            dic = dict()
+            boxes = result.boxes.cpu().numpy()
+    
+            dic['xyxys'] = boxes.xyxy
+            dic['confidences'] = boxes.conf
+            dic['class_id'] = boxes.cls
+            dic['masks'] = result.masks
+            dic['probs'] = result.probs
+            
+            json[list_fname[idx]] = dic
             
         
-        return (xyxys, confidences, classes_id)
-    
-    def predict_image(self, list_fname,conf=0.5):
-        results = self.model.predict(list_fname,conf=conf)
+        return json
+            
+
+    def predict_image(self, fname:str,conf:float=0.5):
+        """
+        Processa uma imagem e retorna um dicionário com os dados obtidos.
+        O dicionário possui as seguintes chaves -> xyxys,confidences,class_id,masks,probs
+        
+        Parâmetros:
+            fname::str: Nome de uma imagem processada para o recorte
+            confiance::float: Grau de confiança que a rede usará para decidir as zonas de recorte,
+            o valor de confiança pode varia entre 0 e 1.
+            
+        Retorno:
+            dic::dict: Dicionário Contendos os dados obtidos no processamento
+        """
+        results = self.model.predict(fname,conf=conf,boxes=False,max_det=2)
 
         dic = dict()
         result = results[0]
-        
         boxes = result.boxes.cpu().numpy()
         
-        xyxys = boxes.xyxy
+        dic['xyxys'] = boxes.xyxy
         dic['confidences'] = boxes.conf
         dic['class_id'] = boxes.cls
         dic['masks'] = result.masks
         dic['probs'] = result.probs
         
-        return (xyxys, confidences, classes_id, masks, probs)
+        return dic
             
             
     def mark_image(self,fname, confiance=0.5):
         if os.path.exists('runs'):
             rmtree('runs')
-        results = self.model.predict(fname,save=True,conf=confiance)
+        results = self.model.predict(fname,save=True,conf=confiance,max_det=2,show_conf=True,show_labels=True)
         del results
     
     def mark_dir_image(self,path, confiance=0.5):
         list_path = glob(os.path.join(path,'*.jpg'))
         if os.path.exists('runs'):
             rmtree('runs')
-        results = self.model.predict(list_path,save=True,conf=confiance)
+        results = self.model.predict(list_path,save=True,conf=confiance,max_det=2,show_conf=True,show_labels=True)
         del results
         
     def axis_image(self,fname,confiance=0.5)->list:
@@ -71,7 +88,7 @@ class Famacha:
     
         """
         xyxys = []
-        result = self.model.predict(fname,conf=confiance)
+        result = self.model.predict(fname,conf=confiance,boxes=False,max_det=2,show_conf=False,show_labels=False)
         
         boxes = result[0].boxes.cpu().numpy()
         
@@ -110,3 +127,32 @@ class Famacha:
         
         return interest_region
     
+    
+    def resize(self,fname,width=640,height=640):
+        img = cv2.resize(cv2.imread(fname),(width,height),interpolation=cv2.INTER_AREA)
+        return img
+    
+    def rotate(self,fname)->tuple:
+        
+        img = cv2.imread(fname)
+
+        (h, w) = img.shape[:2]
+
+        center = (w / 2, h / 2)
+        
+        angle90 = 90
+        angle180 = 180
+        angle270 = 270
+        
+        scale = 1.0
+        
+        M = cv2.getRotationMatrix2D(center, angle90, scale)
+        rotated90 = cv2.warpAffine(img, M, (h, w))
+        
+        M = cv2.getRotationMatrix2D(center, angle180, scale)
+        rotated180 = cv2.warpAffine(img, M, (w, h))
+        
+        M = cv2.getRotationMatrix2D(center, angle270, scale)
+        rotated270 = cv2.warpAffine(img, M, (h, w))
+        
+        return (rotated90,rotated180,rotated270)
