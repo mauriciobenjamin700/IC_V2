@@ -3,6 +3,7 @@ import os
 from shutil import rmtree
 from glob import glob
 import cv2
+import numpy as np
 
 class Famacha:
 
@@ -63,12 +64,17 @@ class Famacha:
         result = results[0]
         boxes = result.boxes.cpu().numpy()
         
-        dic['xyxys'] = boxes.xyxy
-        dic['confidences'] = boxes.conf
-        dic['class_id'] = boxes.cls
-        dic['masks'] = result.masks
-        dic['probs'] = result.probs
+        if not boxes == None:
         
+            dic['xyxys'] = boxes.xyxy
+            dic['confidences'] = boxes.conf
+            dic['class_id'] = boxes.cls
+            #dic['masks'] = (result.masks.xy,result.masks.data)
+            if result.masks != None:
+                dic['masks'] = result.masks.xy
+            else:
+                dic['masks'] = None
+            
         return dic
             
             
@@ -183,3 +189,42 @@ class Famacha:
         rotated270 = cv2.warpAffine(img, M, (h, w))
         
         return (rotated90,rotated180,rotated270)
+    
+    
+    def segment_img(self,fname:str):
+        """
+        Recebe uma imagem famacha, a segmenta e retorna a zona de interesse coletada após a segmentação.
+        
+        Parâmetros:
+            fname::str: Nome do arquivo que será segmentado
+            
+        Retorno:
+            segmentacao:: numpy array contendo a imagem segmentada a ser retornada ou Nada caso não haja oq segementar na imagem
+        """
+        
+        segmentacao = None
+
+        dados = self.predict_image(fname=fname)
+        
+        if len(dados)>0:   
+
+            xy = dados["masks"]
+
+            if xy != None:
+                img = cv2.imread("1,1.jpg")
+
+                mask = np.zeros(img.shape[:2], dtype=np.uint8)
+
+                # Converter a lista de tuplas em um array numpy
+                pts = np.array([tuple(map(int, ponto)) for array in xy for ponto in array], dtype=np.int32)
+
+                # Desenhar a região de interesse na máscara
+                cv2.fillPoly(mask, [pts], (255))  # Preenche a região da máscara com branco
+
+                # Aplicar a máscara na imagem original
+                segmentacao = cv2.bitwise_and(img, img, mask=mask)
+        
+        return segmentacao
+    
+    def segment_dir_img():
+        pass
