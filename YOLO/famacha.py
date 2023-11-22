@@ -10,7 +10,19 @@ class Famacha:
     def __init__(self, path_model='model_segment/weights/best.pt') -> None:
         self.model = YOLO(path_model)
         
-    def predict_dir_image(self, list_fname,conf=0.5):
+    def predict_dir_image(self, list_fname,conf=0.5)->dict:
+        """
+        Processa uma imagem e retorna um dicionário de dicionários com os dados obtidos.
+        Cada chave do dicionário é o nome de uma imagemO dicionário possui as seguintes chaves -> xyxys,confidences,class_id,masks,probs
+        
+        Parâmetros:
+            fname::str: Nome de uma imagem processada para o recorte
+            confiance::float: Grau de confiança que a rede usará para decidir as zonas de recorte,
+            o valor de confiança pode varia entre 0 e 1.
+            
+        Retorno:
+            dic::dict: Dicionário Contendos os dados obtidos no processamento
+        """
         results = self.model.predict(list_fname,conf=conf,boxes=False,max_det=2)
         
         json = {}
@@ -19,14 +31,14 @@ class Famacha:
             
             dic = dict()
             boxes = result.boxes.cpu().numpy()
-    
+
+            dic['masks'] = result.masks
+            dic['probs'] = result.probs
             dic['xyxys'] = boxes.xyxy
             dic['confidences'] = boxes.conf
             dic['class_id'] = boxes.cls
-            dic['masks'] = result.masks
-            dic['probs'] = result.probs
             
-            json[list_fname[idx]] = dic
+            json[os.path.basename(list_fname[idx])] = dic
             
         
         return json
@@ -66,12 +78,27 @@ class Famacha:
         results = self.model.predict(fname,save=True,conf=confiance,max_det=2,show_conf=True,show_labels=True)
         del results
     
-    def mark_dir_image(self,path, confiance=0.5):
-        list_path = glob(os.path.join(path,'*.jpg'))
+    def mark_dir_image(self,path:str, conf:float=0.5)->None:
+        """
+        Acessa um diretório de imagens e pega todas as imagens com a extenção .jpg
+        Salva na pasta 'runs/segment/predict' os resultados da marcação'
+        Salva uma pasta runs/segment/predict/labels'
+        
+        Parâmetros:
+            path::str: Diretório da pasta onde as imagens estão
+            conf::float: Valor representando percetual váriando entre 0 e 1
+            
+            
+        Retorno:
+            Função não retorna nada
+        """
+        data = glob(os.path.join(path,'*.jpg'))
         if os.path.exists('runs'):
             rmtree('runs')
-        results = self.model.predict(list_path,save=True,conf=confiance,max_det=2,show_conf=True,show_labels=True)
-        del results
+        for image in data:
+            results = self.model.predict(image,save=True,conf=conf,imgsz=(640,640),max_det=2,show_conf=True,show_labels=True,save_txt=True,save_conf=True)
+            print(f"\nTerminei {image}")
+        del results, data
         
     def axis_image(self,fname,confiance=0.5)->list:
         """
