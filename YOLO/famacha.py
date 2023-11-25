@@ -64,17 +64,17 @@ class Famacha:
         result = results[0]
         boxes = result.boxes.cpu().numpy()
         
-        if not boxes == None:
+        try:
         
             dic['xyxys'] = boxes.xyxy
             dic['confidences'] = boxes.conf
             dic['class_id'] = boxes.cls
             #dic['masks'] = (result.masks.xy,result.masks.data)
-            if result.masks != None:
-                dic['masks'] = result.masks.xy
-            else:
-                dic['masks'] = None
+            dic['masks'] = result.masks.xy
             
+        except:
+            dic = None
+        
         return dic
             
             
