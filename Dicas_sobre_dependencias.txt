@@ -1,0 +1,31 @@
+Para criar um arquivo de dependências em Python, você pode usar um arquivo chamado `requirements.txt`. Este arquivo lista todas as dependências do seu projeto, permitindo que outros desenvolvedores ou máquinas instalem facilmente as mesmas dependências.
+
+### Criando um arquivo `requirements.txt` manualmente:
+
+1. **Liste suas dependências:**
+   Abra um editor de texto e liste as dependências do seu projeto, uma por linha. Por exemplo:
+   ```
+   requests
+   pandas>=1.0
+   matplotlib==3.2.1
+   ```
+
+   - `requests`: Instalará a versão mais recente do pacote.
+   - `pandas>=1.0`: Instalará o Pandas versão 1.0 ou superior.
+   - `matplotlib==3.2.1`: Instalará exatamente a versão 3.2.1 do Matplotlib.
+
+2. **Salve como `requirements.txt`:**
+   Salve o arquivo com o nome `requirements.txt` na raiz do seu projeto.
+
+### Gerando automaticamente um arquivo `requirements.txt`:
+
+Você pode usar o comando `pip freeze` para listar todas as dependências instaladas no seu ambiente virtual e direcionar a saída para um arquivo `requirements.txt`. 
+
+- No terminal, dentro do ambiente virtual, execute:
+    ```bash
+    pip freeze > requirements.txt
+    ```
+
+Isso vai gravar no arquivo `requirements.txt` todas as dependências instaladas no ambiente virtual. Mais tarde, ao compartilhar o código ou configurar outro ambiente, você pode instalar as mesmas dependências executando `pip install -r requirements.txt`.
+
+Lembre-se de manter o `requirements.txt` atualizado à medida que adiciona, atualiza ou remove dependências do seu projeto.

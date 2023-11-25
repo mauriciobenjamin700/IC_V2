@@ -1,5 +1,6 @@
 from ultralytics import YOLO
-import os
+from os.path import basename,join,exists
+from os import makedirs
 from shutil import rmtree
 from glob import glob
 import cv2
@@ -24,23 +25,27 @@ class Famacha:
         Retorno:
             dic::dict: Dicionário Contendos os dados obtidos no processamento
         """
-        results = self.model.predict(list_fname,conf=conf,boxes=False,max_det=2)
         
         json = {}
         
-        for idx,result in enumerate(results):
-            
-            dic = dict()
-            boxes = result.boxes.cpu().numpy()
+        try:
+            results = self.model.predict(list_fname,conf=conf,boxes=False,max_det=2)
+             
+            for idx,result in enumerate(results):
+                
+                dic = dict()
+                boxes = result.boxes.cpu().numpy()
 
-            dic['masks'] = result.masks
-            dic['probs'] = result.probs
-            dic['xyxys'] = boxes.xyxy
-            dic['confidences'] = boxes.conf
-            dic['class_id'] = boxes.cls
-            
-            json[os.path.basename(list_fname[idx])] = dic
-            
+                dic['masks'] = result.masks
+                dic['probs'] = result.probs
+                dic['xyxys'] = boxes.xyxy
+                dic['confidences'] = boxes.conf
+                dic['class_id'] = boxes.cls
+                
+                json[basename(list_fname[idx])] = dic
+        except:
+            json = None
+               
         
         return json
             
@@ -58,13 +63,14 @@ class Famacha:
         Retorno:
             dic::dict: Dicionário Contendos os dados obtidos no processamento
         """
-        results = self.model.predict(fname,conf=conf,boxes=False,max_det=2)
-
+        
         dic = dict()
-        result = results[0]
-        boxes = result.boxes.cpu().numpy()
         
         try:
+            results = self.model.predict(fname,conf=conf,boxes=False,max_det=2)
+
+            result = results[0]
+            boxes = result.boxes.cpu().numpy()
         
             dic['xyxys'] = boxes.xyxy
             dic['confidences'] = boxes.conf
@@ -79,7 +85,7 @@ class Famacha:
             
             
     def mark_image(self,fname, confiance=0.5):
-        if os.path.exists('runs'):
+        if exists('runs'):
             rmtree('runs')
         results = self.model.predict(fname,save=True,conf=confiance,max_det=2,show_conf=True,show_labels=True)
         del results
@@ -94,12 +100,11 @@ class Famacha:
             path::str: Diretório da pasta onde as imagens estão
             conf::float: Valor representando percetual váriando entre 0 e 1
             
-            
         Retorno:
             Função não retorna nada
         """
-        data = glob(os.path.join(path,'*.jpg'))
-        if os.path.exists('runs'):
+        data = glob(join(path,'*.jpg'))
+        if exists('runs'):
             rmtree('runs')
         for image in data:
             results = self.model.predict(image,save=True,conf=conf,imgsz=(640,640),max_det=2,show_conf=True,show_labels=True,save_txt=True,save_conf=True)
@@ -121,14 +126,17 @@ class Famacha:
     
         """
         xyxys = []
-        result = self.model.predict(fname,conf=confiance,boxes=False,max_det=2,show_conf=False,show_labels=False)
+        try:
+            result = self.model.predict(fname,conf=confiance,boxes=False,max_det=2,show_conf=False,show_labels=False)
+            
+            boxes = result[0].boxes.cpu().numpy()
+            
+            for xyxy in boxes.xyxy:
+            
+                xyxys.append((int(xyxy[0]),int(xyxy[1]),int(xyxy[2]),int(xyxy[3])))
         
-        boxes = result[0].boxes.cpu().numpy()
-        
-        for xyxy in boxes.xyxy:
-        
-            xyxys.append((int(xyxy[0]),int(xyxy[1]),int(xyxy[2]),int(xyxy[3])))
-        
+        except:
+            xyxys = None    
         return xyxys
     
     #recorta a imagem
@@ -147,17 +155,19 @@ class Famacha:
             lista vazia caso não encontre nada
     
         """
-        image = cv2.imread(fname)
-        
         interest_region = []
-        #image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
-         
-        xyxys = self.axis_image(fname=fname,confiance=confiance)
-        if len(xyxys) > 0:
-            for xyxy in xyxys:
-                x1,y1,x2,y2 = xyxy
-                interest_region.append(image[y1:y2, x1:x2])
-        
+        try:
+            
+            image = cv2.imread(fname)
+            
+            xyxys = self.axis_image(fname=fname,confiance=confiance)
+            if len(xyxys) > 0:
+                for xyxy in xyxys:
+                    x1,y1,x2,y2 = xyxy
+                    interest_region.append(image[y1:y2, x1:x2])
+        except:
+            interest_region = None
+            
         return interest_region
     
     
@@ -203,28 +213,41 @@ class Famacha:
         """
         
         segmentacao = None
-
-        dados = self.predict_image(fname=fname)
         
-        if len(dados)>0:   
-
+        try:
+            dados = self.predict_image(fname=fname)
+         
             xy = dados["masks"]
 
-            if xy != None:
-                img = cv2.imread("1,1.jpg")
+            img = cv2.imread(fname)
 
-                mask = np.zeros(img.shape[:2], dtype=np.uint8)
+            mask = np.zeros(img.shape[:2], dtype=np.uint8)
 
-                # Converter a lista de tuplas em um array numpy
-                pts = np.array([tuple(map(int, ponto)) for array in xy for ponto in array], dtype=np.int32)
+            # Converter a lista de tuplas em um array numpy
+            pts = np.array([tuple(map(int, ponto)) for array in xy for ponto in array], dtype=np.int32)
 
-                # Desenhar a região de interesse na máscara
-                cv2.fillPoly(mask, [pts], (255))  # Preenche a região da máscara com branco
+            # Desenhar a região de interesse na máscara
+            cv2.fillPoly(mask, [pts], (255))  # Preenche a região da máscara com branco
 
-                # Aplicar a máscara na imagem original
-                segmentacao = cv2.bitwise_and(img, img, mask=mask)
+            # Aplicar a máscara na imagem original
+            segmentacao = cv2.bitwise_and(img, img, mask=mask)
+        
+        except:
+            pass
         
         return segmentacao
     
-    def segment_dir_img():
-        pass
+    def segment_dir_image(self,dir_images,dir_output):
+        fnames = glob(dir_images)
+        
+        for file in fnames:
+            image = self.segment_img(file)
+            if type(image) != None:
+                cv2.imwrite(join(dir_output,basename(file)), image)
+            else:
+                falha = join(dir_output,'falhas')
+                if not exists(falha):
+                    makedirs(falha)
+                    
+                cv2.imwrite(join(falha,basename(file)), cv2.imread(file))
+                
