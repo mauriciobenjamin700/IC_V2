@@ -1,24 +1,29 @@
 from famacha import Famacha
 from glob import glob
-from cv2 import imwrite
+from cv2 import imwrite,imread
 from os.path import basename, exists
 from os import makedirs
 
-DIR = '..\\Dados\\'
+DIR = '../Dados/'
 DATASET = 'teste'
-OUTPUT = 'segmentation'
+OUTPUT = DIR + 'segmentation'
+FAIL = OUTPUT + '/fail'
 
-if not exists(DIR+OUTPUT):
-    makedirs(DIR+OUTPUT)
+if not exists(OUTPUT):
+    makedirs(OUTPUT)
+    
+if not exists(FAIL):
+    makedirs(FAIL)
 
-fnames = glob(DIR + DATASET+'\\*.jpg')
+fnames = glob(DIR + DATASET+'/*.jpg')
 
 f = Famacha()
 
 for file in fnames:
     image = f.segment_img(file)
-    if type(image) != None:
-        imwrite(DIR+OUTPUT+'\\'+basename(file), image)
+    try:
+        imwrite(OUTPUT+'/'+basename(file), image)
         print("\nTerminei ", file)
-    else:
+    except:
         print("\nFalhei ", file)
+        imwrite(FAIL+'/'+basename(file), imread(file))

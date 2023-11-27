@@ -3,7 +3,7 @@ from os.path import basename,join,exists
 from os import makedirs
 from shutil import rmtree
 from glob import glob
-import cv2
+from cv2 import imwrite,imread, resize,INTER_AREA,getRotationMatrix2D, warpAffine,fillPoly,bitwise_and
 import numpy as np
 
 class Famacha:
@@ -15,7 +15,7 @@ class Famacha:
     def predict_dir_image(self, list_fname,conf=0.5)->dict:
         """
         Processa uma imagem e retorna um dicionário de dicionários com os dados obtidos.
-        Cada chave do dicionário é o nome de uma imagemO dicionário possui as seguintes chaves -> xyxys,confidences,class_id,masks,probs
+        Cada chave do dicionário é o nome de uma imagem, dicionário possui as seguintes chaves -> xyxys,confidences,class_id,masks,probs
         
         Parâmetros:
             fname::str: Nome de uma imagem processada para o recorte
@@ -158,7 +158,7 @@ class Famacha:
         interest_region = []
         try:
             
-            image = cv2.imread(fname)
+            image = imread(fname)
             
             xyxys = self.axis_image(fname=fname,confiance=confiance)
             if len(xyxys) > 0:
@@ -172,12 +172,12 @@ class Famacha:
     
     
     def resize(self,fname,width=640,height=640):
-        img = cv2.resize(cv2.imread(fname),(width,height),interpolation=cv2.INTER_AREA)
+        img = resize(imread(fname),(width,height),interpolation=INTER_AREA)
         return img
     
     def rotate(self,fname)->tuple:
         
-        img = cv2.imread(fname)
+        img = imread(fname)
 
         (h, w) = img.shape[:2]
 
@@ -189,14 +189,14 @@ class Famacha:
         
         scale = 1.0
         
-        M = cv2.getRotationMatrix2D(center, angle90, scale)
-        rotated90 = cv2.warpAffine(img, M, (h, w))
+        M = getRotationMatrix2D(center, angle90, scale)
+        rotated90 = warpAffine(img, M, (h, w))
         
-        M = cv2.getRotationMatrix2D(center, angle180, scale)
-        rotated180 = cv2.warpAffine(img, M, (w, h))
+        M = getRotationMatrix2D(center, angle180, scale)
+        rotated180 = warpAffine(img, M, (w, h))
         
-        M = cv2.getRotationMatrix2D(center, angle270, scale)
-        rotated270 = cv2.warpAffine(img, M, (h, w))
+        M = getRotationMatrix2D(center, angle270, scale)
+        rotated270 = warpAffine(img, M, (h, w))
         
         return (rotated90,rotated180,rotated270)
     
@@ -219,7 +219,7 @@ class Famacha:
          
             xy = dados["masks"]
 
-            img = cv2.imread(fname)
+            img = imread(fname)
 
             mask = np.zeros(img.shape[:2], dtype=np.uint8)
 
@@ -227,10 +227,10 @@ class Famacha:
             pts = np.array([tuple(map(int, ponto)) for array in xy for ponto in array], dtype=np.int32)
 
             # Desenhar a região de interesse na máscara
-            cv2.fillPoly(mask, [pts], (255))  # Preenche a região da máscara com branco
+            fillPoly(mask, [pts], (255))  # Preenche a região da máscara com branco
 
             # Aplicar a máscara na imagem original
-            segmentacao = cv2.bitwise_and(img, img, mask=mask)
+            segmentacao = bitwise_and(img, img, mask=mask)
         
         except:
             pass
@@ -238,16 +238,15 @@ class Famacha:
         return segmentacao
     
     def segment_dir_image(self,dir_images,dir_output):
-        fnames = glob(dir_images)
+        fnames = glob(join(dir_images,'*.jpg'))
+        fail = join(dir_output,'fail')
+        if not exists(fail):
+            makedirs(fail)
         
         for file in fnames:
             image = self.segment_img(file)
-            if type(image) != None:
-                cv2.imwrite(join(dir_output,basename(file)), image)
-            else:
-                falha = join(dir_output,'falhas')
-                if not exists(falha):
-                    makedirs(falha)
-                    
-                cv2.imwrite(join(falha,basename(file)), cv2.imread(file))
+            try:
+                imwrite(join(dir_output,basename(file)), image)
+            except:
+                imwrite(join(fail,basename(file)), imread(file))
                 
