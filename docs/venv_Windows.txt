@@ -1,5 +1,5 @@
 python -m venv "nome da tua venv"
-    .\venv\Scripts\Activate.ps1
+    venv\Scripts\Activate.ps1
     abra o windows power shell admin
     dentro do powershell use o comando a baixo
     Set-ExecutionPolicy -Scope CurrentUser -ExecutionPolicy RemoteSigned

@@ -4,7 +4,7 @@ import os
 import zipfile
 from show import blob_imagem,alturaXlargura
 from work import deteccoes, funcoes_imagem
-from drive import driveFile
+from Tests.drive import driveFile
 
 
 if not os.path.exists("modelo.zip"):
