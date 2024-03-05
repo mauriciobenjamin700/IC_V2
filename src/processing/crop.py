@@ -57,7 +57,7 @@ def predict_image(image:str,modelsPath:str="best.pt",conf:float=0.5):
         return dic
 
 
-def segment(image:ndarray):
+def segment(image:ndarray,model: YOLO):
     """
     Recebe uma imagem famacha, a segmenta e retorna a zona de interesse coletada após a segmentação.
     
@@ -70,32 +70,35 @@ def segment(image:ndarray):
     
     segmentacao = None
     
-    try:
-        dados = predict_image(image)
-        
-        xy = dados["masks"]
+    #try:
+    results = model.predict(source=image,boxes=False,conf=0.3,max_det=1)
 
+    result = results[0]
+    xy = result.masks.xy
 
-        mask = zeros(image.shape[:2], dtype=uint8)
+    mask = zeros(image.shape[:2], dtype=uint8)
 
-        # Converter a lista de tuplas em um array numpy
-        pts = array([tuple(map(int, ponto)) for array in xy for ponto in array], dtype=int32)
+    # Converter a lista de tuplas em um array numpy
+    pts = array([tuple(map(int, ponto)) for array in xy for ponto in array], dtype=int32)
 
-        # Desenhar a região de interesse na máscara
-        fillPoly(mask, [pts], (255))  # Preenche a região da máscara com branco
+    # Desenhar a região de interesse na máscara
+    fillPoly(mask, [pts], (255))  # Preenche a região da máscara com branco
 
-        # Aplicar a máscara na imagem original
-        segmentacao = bitwise_and(image, image, mask=mask)
+    # Aplicar a máscara na imagem original
+    segmentacao = bitwise_and(image, image, mask=mask)
     
-    except:
-        pass
+    #except:
+    #    pass
     
     return segmentacao
 
 
 if __name__ == "__main__":
     from cv2 import imread, imwrite
-
-    result = (segment(imread(r"Dados\dados\img1_4.jpg")))
     
-    imwrite("test\segmentado.jpg",result)
+    image = imread(r"Dados\dados\img3_1.jpg")
+    model = YOLO("best.pt")
+
+    result = segment(image,model)
+    print(result)
+    imwrite(r"test\segmentado.jpg",result)

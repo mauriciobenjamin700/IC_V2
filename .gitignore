@@ -3,6 +3,7 @@ venv
 __pycache__
 __pycache__/
 test
+datasets
 
 # tipos de arquivo
 *.log
