@@ -1,7 +1,7 @@
 from cv2 import imread,cvtColor,COLOR_BGR2RGB
 from numpy import ndarray
 from typing import List
-from os.path import exists,join
+from os.path import exists,join,basename
 from glob import glob
 
 
@@ -23,9 +23,6 @@ def image(filename:str="image.jpg")->ndarray:
             file = file[:,:,:3]
         file = cvtColor(file,COLOR_BGR2RGB)
         
-    else:
-        raise TypeError("Não foi possivel carregar a imagem!")
-        
     return file
 
 
@@ -40,6 +37,7 @@ def folder(foldername:str="images")->List[ndarray]:
         images::List[ndarray]: Lista de imagens validas lida ou lista vazia caso não consiga ler
     """
     images = []
+    labels = []
     
     if exists(foldername):
         extensions = ['*.jpg', '*.jpeg', '*.png', '*.bmp', '*.tiff', '*.tif']
@@ -51,9 +49,9 @@ def folder(foldername:str="images")->List[ndarray]:
 
         for file in files:
             images.append(image(file))
-    
-    return images
+            labels.append(basename(file))
+    return images,labels
 
 
 if __name__ == "__main__":
-    print(len(folder(r"Dados\dados")))
+    print(folder(r"Dados\dados")[1][300])
