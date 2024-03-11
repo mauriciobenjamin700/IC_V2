@@ -5,3 +5,4 @@ current_dir = dirname(abspath(__file__))
 sys.path.append(current_dir)
 
 from extract import *
+from train import *

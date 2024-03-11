@@ -3,10 +3,9 @@ from numpy import ndarray, mean, median, std
 from typing import List
 from pandas import DataFrame
 
-def train(images:List[ndarray],labels:List[str])->DataFrame:
+def ds2df(images:List[ndarray],labels:List[str])->DataFrame:
     """
-    Extrai as caracteristica () de uma base de dados passada como parâmetro e 
-    arquiva os resultados em um DF
+    Extrai as caracteristica de uma base de dados (dataset contendo imagens e rotulos) e a salva em um dataframe
     
     Args:
        images::List[ndarray]: Lista de imagens que serão processadas
