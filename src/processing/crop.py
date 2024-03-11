@@ -3,7 +3,27 @@ from typing import Tuple,List
 from numpy import ndarray,uint8,int32,zeros,array
 from ultralytics import YOLO
 
-def imageList(images:List[ndarray], size:Tuple[int,int] = (640,640))-> List[ndarray]:
+def getModel(filePath:str = r"models\best.pt") -> YOLO | None:
+    """
+    Recebe o caminho de um modelo YOLO e o retorna
+    Caso falhe ao encontrar o modelo retorna None
+    
+    Args:
+        filepath::str: Caminho para o arquivo .pt
+        
+    Return:
+        Model:: Yolo | None: Retorna o modelo carrega ou None em caso de falha
+        
+    """
+    
+    try:
+        model = YOLO(filePath)
+    except:
+        model = None
+        
+    return model
+
+def resizeList(images:List[ndarray], size:Tuple[int,int] = (640,640))-> List[ndarray]:
     """
     Redimensiona uma lista de imagens para a proporção desejada
     
@@ -61,15 +81,13 @@ def segment(image:ndarray,model: YOLO):
     """
     Recebe uma imagem famacha, a segmenta e retorna a zona de interesse coletada após a segmentação.
     
-    Parâmetros:
+    Args:
         image::ndarray: Imagem que será segmentada
-        
-    Retorno:
+        model::YOLO: Modelo YOLO treinado para realiazar a segmentação
+ 
+    Return:
         segmentacao::ndarray: Imagem segmentada a ser retornada ou Nada caso não haja oq segementar na imagem
     """
-    
-    
-    
     try:
         results = model.predict(source=image,boxes=False,conf=0.3,max_det=1)
 
@@ -92,23 +110,28 @@ def segment(image:ndarray,model: YOLO):
     
     return segmentacao
 
-def segmentedList(images:List[ndarray])->List[ndarray]:
+def segmentedList(images:List[ndarray], model:YOLO, is_resized: bool = False )->List[ndarray]:
     """
-    Recebe uma lista de imagens processadas e realizada a segmentação em cada uma das imagens.
+    Recebe uma lista de imagens e realizada a segmentação em cada uma das imagens.
     Caso a imagem seja uma imagem válida, retorna a zona de interesse obtida pela segmentação.
     Caso não seja, retorna um valor Nulo para aquela imagem
     
     Args:
         images::List[ndarray]: Lista de imagens a serem segmentadas
+        model::YOLO: Modelo YOLO treinado para realizar a segmentação
+        is_resized::bool: Caso as imagens já estejam redimensionadas para a proporção ideal passe True
         
     Return:
         segmented::List[ndarray | None]: Lista com as imagens ou None caso a imagem não tenha a zona de interesse
          
     """
+    if is_resized == False:
+        images = resizeList(images)
+    
     segmented = []
     
     for image in images:
-        segmented.append(segment(image))
+        segmented.append(segment(images,model))
         
     return segmented
 

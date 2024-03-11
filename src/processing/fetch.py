@@ -1,6 +1,6 @@
 from cv2 import imread,cvtColor,COLOR_BGR2RGB
 from numpy import ndarray
-from typing import List
+from typing import List, Tuple
 from os.path import exists,join,basename
 from glob import glob
 
@@ -26,7 +26,7 @@ def image(filename:str="image.jpg")->ndarray:
     return file
 
 
-def folder(foldername:str="images")->List[ndarray]:
+def folder(foldername:str="images")->Tuple[List[ndarray],List[str]]:
     """
     Retorna uma lista de imagens ou uma lista vazia com base na pasta passada 
     
@@ -34,7 +34,7 @@ def folder(foldername:str="images")->List[ndarray]:
         foldername::str: Caminho para a pasta que será acessada
         
     Return:
-        images::List[ndarray]: Lista de imagens validas lida ou lista vazia caso não consiga ler
+        dataset::Tuple[List[ndarray],List[str]]: Lista de imagens e rotulos validas lida ou lista vazia caso não consiga ler
     """
     images = []
     labels = []
@@ -50,7 +50,7 @@ def folder(foldername:str="images")->List[ndarray]:
         for file in files:
             images.append(image(file))
             labels.append(basename(file))
-    return images,labels
+    return (images,labels)
 
 
 if __name__ == "__main__":
