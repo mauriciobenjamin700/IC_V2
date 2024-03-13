@@ -96,6 +96,166 @@ def Rf(df: DataFrame, test_size:float=0.1, n_estimators:int=100)-> tuple:
 
     return model, accuracy, precision, recall, f1, kappa
 
+from sklearn.svm import SVC
+
+def SVM(df: DataFrame, test_size:float=0.1)-> tuple:
+    selected_columns = [
+        'Mean_R',
+        'Mean_G',
+        'Mean_B',
+        'Median_R',
+        'Median_G',
+        'Median_B',
+        'Std_R',
+        'Std_G',
+        'Std_B'
+    ]
+
+    features = df[selected_columns]
+    target = df['FAMACHA']
+
+    # Divide os dados em conjuntos de treino e teste
+    train_data, test_data, train_target, test_target = train_test_split(
+        features, target, test_size=test_size, random_state=0)
+    
+    model = SVC(kernel='rbf', random_state=0)  # Kernel pode ser alterado conforme necessário
+    model.fit(train_data, train_target)
+    predictions = model.predict(test_data)
+
+    accuracy = round(accuracy_score(test_target, predictions) * 100,2)
+    precision = round(precision_score(test_target, predictions) * 100,2)
+    recall = round(recall_score(test_target, predictions) * 100,2)
+    f1 = round(f1_score(test_target, predictions) * 100,2)
+    kappa = round(cohen_kappa_score(test_target, predictions) * 100,2)
+
+    return model, accuracy, precision, recall, f1, kappa
+
+from sklearn.neural_network import MLPClassifier
+
+def MLP(df: DataFrame, test_size:float=0.1)-> tuple:
+    selected_columns = [
+        'Mean_R',
+        'Mean_G',
+        'Mean_B',
+        'Median_R',
+        'Median_G',
+        'Median_B',
+        'Std_R',
+        'Std_G',
+        'Std_B'
+    ]
+
+    features = df[selected_columns]
+    target = df['FAMACHA']
+
+    # Divide os dados em conjuntos de treino e teste
+    train_data, test_data, train_target, test_target = train_test_split(
+        features, target, test_size=test_size, random_state=0
+    )
+    # Resto do seu código permanece igual, exceto pelo modelo a ser treinado
+    model = MLPClassifier(hidden_layer_sizes=(100,), max_iter=1000, random_state=0)
+    model.fit(train_data, train_target)
+    predictions = model.predict(test_data)
+
+    accuracy = round(accuracy_score(test_target, predictions) * 100,2)
+    precision = round(precision_score(test_target, predictions) * 100,2)
+    recall = round(recall_score(test_target, predictions) * 100,2)
+    f1 = round(f1_score(test_target, predictions) * 100,2)
+    kappa = round(cohen_kappa_score(test_target, predictions) * 100,2)
+
+    return model, accuracy, precision, recall, f1, kappa
+    
+from sklearn.ensemble import GradientBoostingClassifier
+
+def GBM(df: DataFrame, test_size:float=0.1)-> tuple:
+    selected_columns = [
+        'Mean_R',
+        'Mean_G',
+        'Mean_B',
+        'Median_R',
+        'Median_G',
+        'Median_B',
+        'Std_R',
+        'Std_G',
+        'Std_B'
+    ]
+
+    features = df[selected_columns]
+    target = df['FAMACHA']
+
+    # Divide os dados em conjuntos de treino e teste
+    train_data, test_data, train_target, test_target = train_test_split(
+        features, target, test_size=test_size, random_state=0
+    )
+    model = GradientBoostingClassifier(random_state=0)
+    model.fit(train_data, train_target)
+    predictions = model.predict(test_data)
+
+    accuracy = round(accuracy_score(test_target, predictions) * 100,2)
+    precision = round(precision_score(test_target, predictions) * 100,2)
+    recall = round(recall_score(test_target, predictions) * 100,2)
+    f1 = round(f1_score(test_target, predictions) * 100,2)
+    kappa = round(cohen_kappa_score(test_target, predictions) * 100,2)
+
+    return model, accuracy, precision, recall, f1, kappa
+
+from sklearn.neighbors import KNeighborsClassifier
+
+def KNN(df: DataFrame, test_size:float=0.1)-> tuple:
+    selected_columns = [
+        'Mean_R',
+        'Mean_G',
+        'Mean_B',
+        'Median_R',
+        'Median_G',
+        'Median_B',
+        'Std_R',
+        'Std_G',
+        'Std_B'
+    ]
+
+    features = df[selected_columns]
+    target = df['FAMACHA']
+
+    # Divide os dados em conjuntos de treino e teste
+    train_data, test_data, train_target, test_target = train_test_split(
+        features, target, test_size=test_size, random_state=0
+    )
+    model = KNeighborsClassifier()
+    model.fit(train_data, train_target)
+    predictions = model.predict(test_data)
+
+    accuracy = round(accuracy_score(test_target, predictions) * 100,2)
+    precision = round(precision_score(test_target, predictions) * 100,2)
+    recall = round(recall_score(test_target, predictions) * 100,2)
+    f1 = round(f1_score(test_target, predictions) * 100,2)
+    kappa = round(cohen_kappa_score(test_target, predictions) * 100,2)
+
+    return model, accuracy, precision, recall, f1, kappa
+    
+# Exemplo de CNN usando Keras com TensorFlow backend
+#from tensorflow.keras.models import Sequential
+#from tensorflow.keras.layers import Conv2D, MaxPooling2D, Flatten, Dense
+
+"""
+def CNN(df: DataFrame, test_size:float=0.1)-> tuple:
+    # Seus dados precisam estar em um formato adequado para CNNs (ex: imagens)
+    # Você pode precisar adaptar seu DataFrame para se adequar a este modelo
+    model = Sequential([
+        Conv2D(32, (3, 3), activation='relu', input_shape=(altura, largura, canais)),
+        MaxPooling2D((2, 2)),
+        Conv2D(64, (3, 3), activation='relu'),
+        MaxPooling2D((2, 2)),
+        Conv2D(64, (3, 3), activation='relu'),
+        Flatten(),
+        Dense(64, activation='relu'),
+        Dense(1, activation='sigmoid')
+    ])
+    model.compile(optimizer='adam', loss='binary_crossentropy', metrics=['accuracy'])
+    # Treine seu modelo com os dados e retorne as métricas
+"""    
+
+
 def Best_rf(df: DataFrame, save_results: str = '', )->RF:
     """
     Obtem o melhor resultado do modelo RandomForest calculado com base na melhor combinação dos parâmetros (testsize, n_estimators) 
