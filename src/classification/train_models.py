@@ -133,6 +133,7 @@ def SVM(df: DataFrame, test_size:float=0.1)-> tuple:
 from sklearn.neural_network import MLPClassifier
 
 def MLP(df: DataFrame, test_size:float=0.1)-> tuple:
+    
     selected_columns = [
         'Mean_R',
         'Mean_G',
@@ -254,6 +255,75 @@ def CNN(df: DataFrame, test_size:float=0.1)-> tuple:
     model.compile(optimizer='adam', loss='binary_crossentropy', metrics=['accuracy'])
     # Treine seu modelo com os dados e retorne as métricas
 """    
+
+import xgboost as xgb
+
+
+def XGBoost(df: DataFrame, test_size:float=0.1)-> tuple:
+    """
+    Realiza o treinamento de um modelo para um classificador XGBoost.
+    Retorna o modelo e o calculo de suas principais métricas:
+    a acurácia (que expressa a precisão das previsões),
+    a precisão (indicando a proporção de previsões positivas corretas), 
+    o recall (que representa a capacidade do modelo de identificar corretamente instâncias positivas), 
+    o F1-score (uma média harmônica entre precisão e recall) 
+    e o coeficiente Kappa de Cohen (uma medida que avalia a concordância entre as previsões do modelo e os valores reais, ajustada para o acaso).
+
+    Args:
+        df::DataFrame: DataFrame contendo as caracteristicas dos dados que serão usadas para treinar o modelo
+        test_size::float: Quantidade de dados destinados para os testes, onde o restante será destinado para treino.
+
+    Returns:
+        model, accuracy, precision, recall, f1, kappa ::tuple: Modelo e suas métricas 
+    """
+
+    # Seleciona colunas relevantes para análise
+    selected_columns = [
+        'Mean_R',
+        'Mean_G',
+        'Mean_B',
+        'Median_R',
+        'Median_G',
+        'Median_B',
+        'Std_R',
+        'Std_G',
+        'Std_B'
+    ]
+
+    features = df[selected_columns]
+    target = df['FAMACHA']
+
+    # Divide os dados em conjuntos de treino e teste
+    train_data, test_data, train_target, test_target = train_test_split(
+        features, target, test_size=test_size, random_state=0
+    )
+
+    # Configuração dos parâmetros do modelo
+    params = {
+        'objective': 'binary:logistic',
+        'eval_metric': 'logloss'
+    }
+
+    # Transforma os dados em uma matriz DMatrix para XGBoost
+    dtrain = xgb.DMatrix(train_data, label=train_target)
+    dtest = xgb.DMatrix(test_data, label=test_target)
+
+    # Treinamento do modelo
+    num_round = 100
+    bst = xgb.train(params, dtrain, num_round)
+
+    # Previsões
+    predictions_proba = bst.predict(dtest)
+    predictions = [1 if pred > 0.5 else 0 for pred in predictions_proba]
+
+    # Cálculo das métricas
+    accuracy = round(accuracy_score(test_target, predictions) * 100, 2)
+    precision = round(precision_score(test_target, predictions) * 100, 2)
+    recall = round(recall_score(test_target, predictions) * 100, 2)
+    f1 = round(f1_score(test_target, predictions) * 100, 2)
+    kappa = round(cohen_kappa_score(test_target, predictions) * 100, 2)
+
+    return bst, accuracy, precision, recall, f1, kappa
 
 
 def Best_rf(df: DataFrame, save_results: str = '', )->RF:
