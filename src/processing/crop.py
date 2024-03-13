@@ -9,7 +9,7 @@ import torchvision
 from numpy import ndarray
 from typing import Union
 
-def getModel(filePath:str = r"models\best.pt") -> YOLO | None:
+def GetModel(filePath:str = r"models\best.pt") -> YOLO | None:
     """
     Recebe o caminho de um modelo YOLO e o retorna
     Caso falhe ao encontrar o modelo retorna None
@@ -29,7 +29,7 @@ def getModel(filePath:str = r"models\best.pt") -> YOLO | None:
         
     return model
 
-def resizeList(images:List[ndarray], size:Tuple[int,int] = (640,640))-> List[ndarray]:
+def ResizeList(images:List[ndarray], size:Tuple[int,int] = (640,640))-> List[ndarray]:
     """
     Redimensiona uma lista de imagens para a proporção desejada
     
@@ -48,7 +48,7 @@ def resizeList(images:List[ndarray], size:Tuple[int,int] = (640,640))-> List[nda
         
     return resized
 
-def predict_image(image:str,modelsPath:str="best.pt",conf:float=0.5):
+def Predict_image(image:str,modelsPath:str="best.pt",conf:float=0.5):
         """
         Processa uma imagem e retorna um dicionário com os dados obtidos.
         O dicionário possui as seguintes chaves -> xyxys,confidences,class_id,masks,probs
@@ -83,19 +83,20 @@ def predict_image(image:str,modelsPath:str="best.pt",conf:float=0.5):
         return dic
 
 
-def segment(image: ndarray, model: YOLO) -> Union[ndarray, None]:
+def Segment(image: ndarray, model: YOLO, conf: float = 0.5) -> Union[ndarray, None]:
     """
     Recebe uma imagem famacha, a segmenta e retorna a zona de interesse coletada após a segmentação.
     
     Args:
         image::ndarray: Imagem que será segmentada
         model::YOLO: Modelo YOLO treinado para realizar a segmentação
+        conf::float: Confiança da box durante a detecção
  
     Return:
         segmentacao::ndarray: Imagem segmentada a ser retornada ou Nada caso não haja o que segmentar na imagem
     """
     # Realiza a predição do modelo na imagem
-    results = model.predict(source=image, boxes=False, conf=0.3, max_det=1)
+    results = model.predict(source=image, boxes=False, conf=conf, max_det=1)
     
     segmentacao = None
     
@@ -126,7 +127,7 @@ def segment(image: ndarray, model: YOLO) -> Union[ndarray, None]:
             scores = torch.zeros(boxes.shape[0], dtype=torch.float32)
 
             # Aplicar a supressão não máxima (NMS)
-            indices = torchvision.ops.nms(boxes, scores, iou_threshold=0.30)
+            indices = torchvision.ops.nms(boxes, scores, iou_threshold=conf)
 
             # Verificar se os índices estão dentro do alcance válido de xy antes de acessá-los
             filtered_xy = [xy[i] for i in indices if i < len(xy)]
@@ -146,7 +147,7 @@ def segment(image: ndarray, model: YOLO) -> Union[ndarray, None]:
     # Retorna None caso não haja detecções ou máscaras presentes na imagem
     return segmentacao
     """
-def segment(image:ndarray,model: YOLO):
+def Segment(image:ndarray,model: YOLO):
     """
     """
     Recebe uma imagem famacha, a segmenta e retorna a zona de interesse coletada após a segmentação.
@@ -183,7 +184,7 @@ def segment(image:ndarray,model: YOLO):
 
     """
 
-def segmentedList(images:List[ndarray], model:YOLO, is_resized: bool = False )->List[ndarray]:
+def SegmentedList(images:List[ndarray], model:YOLO, is_resized: bool = False, conf: float = 0.5)->List[ndarray]:
     """
     Recebe uma lista de imagens e realizada a segmentação em cada uma das imagens.
     Caso a imagem seja uma imagem válida, retorna a zona de interesse obtida pela segmentação.
@@ -199,12 +200,12 @@ def segmentedList(images:List[ndarray], model:YOLO, is_resized: bool = False )->
          
     """
     if is_resized == False:
-        images = resizeList(images)
+        images = ResizeList(images)
     
     segmented = []
     
     for image in images:
-        segmented.append(segment(image,model))
+        segmented.append(Segment(image,model,conf))
         
     return segmented
 
@@ -214,6 +215,6 @@ if __name__ == "__main__":
     image = imread(r"Dados\dados\img3_1.jpg")
     model = YOLO("best.pt")
 
-    result = segment(image,model)
+    result = Segment(image,model)
     print(result)
     imwrite(r"test\segmentado.jpg",result)

@@ -5,7 +5,7 @@ from os.path import exists,join,basename
 from glob import glob
 
 
-def image(filename:str="image.jpg")->ndarray:
+def Image(filename:str="image.jpg")->ndarray:
     """
     Retorna uma imagem RGB em formato ndarray com base no item passado
     
@@ -26,9 +26,10 @@ def image(filename:str="image.jpg")->ndarray:
     return file
 
 
-def folder(foldername:str="images")->Tuple[List[ndarray],List[str]]:
+def Folder(foldername:str="images")->Tuple[List[ndarray],List[str]]:
     """
-    Retorna uma lista de imagens ou uma lista vazia com base na pasta passada 
+    Retorna uma lista de imagens ou uma lista vazia com base na pasta passada
+    Caso consiga formar uma lista de imagens, retorna o rotulo de cada imagem 
     
     Args:
         foldername::str: Caminho para a pasta que será acessada
@@ -48,10 +49,10 @@ def folder(foldername:str="images")->Tuple[List[ndarray],List[str]]:
             files.extend(glob(join(foldername,e)))
 
         for file in files:
-            images.append(image(file))
+            images.append(Image(file))
             labels.append(basename(file))
     return (images,labels)
 
 
 if __name__ == "__main__":
-    print(folder(r"Dados\dados")[1][300])
+    print(Folder(r"Dados\dados")[1][300])

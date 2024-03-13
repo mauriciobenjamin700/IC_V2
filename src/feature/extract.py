@@ -2,11 +2,6 @@ from numpy import ndarray, mean, median, std
 from typing import List
 from pandas import DataFrame
 
-
- 
-
-
-
 def oneORmore(images:List[ndarray])->DataFrame:
     """
     Extrai as caracteristica de uma lista de imagens contendo uma ou mais imagens 

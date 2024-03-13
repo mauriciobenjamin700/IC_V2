@@ -10,9 +10,9 @@ from sklearn.metrics import (
     cohen_kappa_score,
 )
 from pandas import DataFrame
-from os.path import basename,splitext,join
+from os.path import basename,splitext, exists, join
 
-def file2df(file:str="dataset.csv")->DataFrame:
+def File2df(file:str="dataset.csv")->DataFrame:
     """
     Carrega um dataset no formato DataFrame Pandas
     
@@ -35,19 +35,25 @@ def file2df(file:str="dataset.csv")->DataFrame:
     return df
     
 
-def rf(df: DataFrame, test_size:float=0.1, n_estimators:int=100)-> tuple:
+def Rf(df: DataFrame, test_size:float=0.1, n_estimators:int=100)-> tuple:
     """
     Realiza o treinamento de um modelo para um classficador RandomForest
+    Retorna o modelo e o calculo de suas principais métricas:
+    a acurácia (que expressa a precisão das previsões),
+    a precisão (indicando a proporção de previsões positivas corretas), 
+    o recall (que representa a capacidade do modelo de identificar corretamente instâncias positivas), 
+    o F1-score (uma média harmônica entre precisão e recall) 
+    e o coeficiente Kappa de Cohen (uma medida que avalia a concordância entre as previsões do modelo e os valores reais, ajustada para o acaso).
+
     Args:
         df::DataFrame: DataFrame contendo as caracteristicas dos dados que serão usadas para treinar o modelo
         test_size::float: Quantidade de dados destinados para os testes, onde o restante será destinado para treino.
         n_estimators::int: Número de estimadores (árvores de decisão) que serão utilizados no modelo de RandomForest.
 
     Returns:
-        model, accuracy, precision, recall, f1, kappa::tuple: 
-        Tupla que contém, em ordem, o modelo treinado, a acurácia (que expressa a precisão das previsões), a precisão (indicando a proporção de previsões positivas corretas), o recall (que representa a capacidade do modelo de identificar corretamente instâncias positivas), o F1-score (uma média harmônica entre precisão e recall) e o coeficiente Kappa de Cohen (uma medida que avalia a concordância entre as previsões do modelo e os valores reais, ajustada para o acaso). 
+        model, accuracy, precision, recall, f1, kappa ::tuple: Modelo e suas métricas 
+ 
     """
-
 
     # Seleciona colunas relevantes para análise
     selected_columns = [
@@ -90,7 +96,7 @@ def rf(df: DataFrame, test_size:float=0.1, n_estimators:int=100)-> tuple:
 
     return model, accuracy, precision, recall, f1, kappa
 
-def best_rf(df: DataFrame)->RF:
+def Best_rf(df: DataFrame, save_results: str = '', )->RF:
     """
     Obtem o melhor resultado do modelo RandomForest calculado com base na melhor combinação dos parâmetros (testsize, n_estimators) 
     Gera um arquivo .csv contendo todos os parâmetros testados
@@ -98,6 +104,7 @@ def best_rf(df: DataFrame)->RF:
 
     Args:
        df::DataFrame: DataFrame contendo as caracteristicas dos dados que serão usadas para treinar o modelo
+       save_results::str: Caminho para salvar o dataset com os resultados do modelo, onde caso seja passado um caminho valido, é gerado um csv com os resultados do processamento.
         
     Return:
         best::RF: Melhor modelo gerado apartir do treinamento
@@ -117,7 +124,7 @@ def best_rf(df: DataFrame)->RF:
             
             row +=1
             
-            model,acuracia, precision, recall, f1, kappa = rf(df,test_size=test_size/100,n_estimators=n_estimators)
+            model,acuracia, precision, recall, f1, kappa = Rf(df,test_size=test_size/100,n_estimators=n_estimators)
             
             result = acuracia + precision + recall + f1 + kappa
             
@@ -126,21 +133,19 @@ def best_rf(df: DataFrame)->RF:
                 best = model
                 idx = row
                 
-                
-                
             
             lista_dados.append([f'{(test_size/100):.1f}',n_estimators,acuracia,precision,recall,f1, kappa])
 
             print(f'\n Teste usando {test_size} & {n_estimators} Realizado!')
 
-
-    df = DataFrame(data=lista_dados,columns=colunas)
-    df.to_csv(f"best in row {idx}", index=False)
+    if save_results != '' and exists(save_results):
+        df = DataFrame(data=lista_dados,columns=colunas)
+        df.to_csv(join(save_results,f"best in row {idx}.csv"), index=False)
     
     return best
 
 
-def save_model(model:RF, model_name:str)->None:
+def Save_model(model:RF, model_name:str)->None:
     """
     Salva um modelo RandomForestClassifer em um arquivo.pkl 
     
@@ -158,7 +163,7 @@ def save_model(model:RF, model_name:str)->None:
 
 if __name__ == '__main__':
     # Avalia o modelo com o arquivo de dados 'FAMACHA_SEGMENTADA'
-    model, accuracy, precision, recall, f1, kappa = rf('FAMACHA_SEGMENTADA')
+    model, accuracy, precision, recall, f1, kappa = Rf('FAMACHA_SEGMENTADA')
 
     # Imprime as métricas de avaliação
     print('Acurácia = ', accuracy)

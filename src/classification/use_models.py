@@ -1,7 +1,7 @@
 from pickle import load
 from pandas import DataFrame
 
-def loadModel(name_model='Modelo.pkl'):
+def Load_model(name_model='Modelo.pkl'):
     """
     Carregar o modelo RandomForestClassifer salvo em um arquivo pkl e o retorna.
     
