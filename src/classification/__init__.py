@@ -6,3 +6,4 @@ sys.path.append(current_dir)
 
 from train_models import *
 from use_models import *
+from validat_models import *

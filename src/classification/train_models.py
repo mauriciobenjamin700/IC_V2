@@ -366,7 +366,6 @@ def Best_rf(df: DataFrame, save_results: str = '', )->RF:
             
             lista_dados.append([f'{(test_size/100):.1f}',n_estimators,acuracia,precision,recall,f1, kappa])
 
-            print(f'\n Teste usando {test_size} & {n_estimators} Realizado!')
 
     if save_results != '' and exists(save_results):
         df = DataFrame(data=lista_dados,columns=colunas)

@@ -1,0 +1,13 @@
+,0,1,2,3,4,5
+0,KNeighborsClassifier(),92.24,95.52,91.43,93.43,83.97
+1,GradientBoostingClassifier(random_state=0),93.1,95.59,92.86,94.2,85.7
+2,"MLPClassifier(max_iter=1000, random_state=0)",70.69,74.8,71.32,73.02,40.98
+3,SVC(random_state=0),74.14,71.7,88.37,79.17,46.03
+4,<xgboost.core.Booster object at 0x00000256F2D8E030>,94.83,95.35,95.35,95.35,89.52
+5,KNeighborsClassifier(),85.34,86.82,86.82,86.82,70.32
+6,GradientBoostingClassifier(random_state=0),87.93,86.86,92.25,89.47,75.36
+7,"MLPClassifier(max_iter=1000, random_state=0)",72.13,68.58,92.27,78.68,40.85
+8,SVC(random_state=0),68.39,66.41,87.63,75.56,33.16
+9,<xgboost.core.Booster object at 0x00000256F2D8EC00>,94.25,95.79,93.81,94.79,88.38
+10,KNeighborsClassifier(),83.91,83.17,89.18,86.07,67.08
+11,GradientBoostingClassifier(random_state=0),87.07,86.34,91.24,88.72,73.6
