@@ -67,7 +67,7 @@ def Predict_image(image:str,modelsPath:str="best.pt",conf:float=0.5):
         
         try:
             model = YOLO(modelsPath)
-            results = model.predict(image,conf=conf,boxes=False,max_det=2)
+            results = model.predict(image,conf=conf,boxes=False,max_det=1)
 
             result = results[0]
             boxes = result.boxes.cpu().numpy()
@@ -137,7 +137,7 @@ def Segment(image: ndarray, model: YOLO, conf: float = 0.5) -> Union[ndarray, No
             # Converter a lista de tuplas em um array numpy
             pts = np.array([tuple(map(int, ponto)) for array in filtered_xy for ponto in array], dtype=np.int32)
 
-            # Desenhar a região de interesse na máscara
+            # Desenhar a região de interesse na máscara (casso erro trocar 1 por 255)
             fillPoly(mask, [pts], (255))  # Preenche a região da máscara com branco
 
             # Aplicar a máscara na imagem original

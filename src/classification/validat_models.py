@@ -1,15 +1,16 @@
-from os.path import exists
+from os.path import exists, join
 from pandas import DataFrame
-def List2Best(models_list,export:str = "",ascended: bool = False):
+
+def List2Best(models_list, export: str = "", name: str = "modelos.csv", reverse: bool = False):
     """
     Recebe uma lista de tupas vindas das funções geradoras dos modelos
     retorna o melhor modelo e suas métricas
     
     Args:
-        models_list::list: lista de tuplas, onde o primeiro elemento da lista é um modelo e os demas campos são suas métricas
+        models_list::list: lista de tuplas, onde o primeiro elemento da lista é um modelo e os demais campos são suas métricas
         export::str: caso receba um diretório valido, exporta os resultados dos modelos para uma arquivo .csv
-        ascended::bool: Caso seja verdadeiro a ordem dos modelos será crescente, caso contrario decrescente
-        
+        name::str: nome do arquivo de saida do CSV
+       
     Return:
         best::model: Melhor modelo gerado
     """
@@ -17,20 +18,21 @@ def List2Best(models_list,export:str = "",ascended: bool = False):
     best_value = 0
     best = None
     
-    not_best = []
+    results = []
     
     for model_info in models_list:
-        if sum(model_info[1:]) > best_value:
-            best_value = sum(model_info[1:])
+        value = sum(model_info[2:])
+        if value > best_value:
+            best_value = value
             best = model_info[0]
-        else:
-            not_best.append(model_info)
+            
+        aux = list(model_info)
+        aux.append(value)
+        results.append(aux)
     
-    print(exists(export))
-    if exists(export):
-        df = DataFrame(not_best)
-        df.to_csv(export)
-        print("exportei")
+    if len(export) > 0 and exists(export):
+        columns = ['Modelo', 'Versão', 'Accuracy', 'Precision', 'Recall', 'F1', 'Kappa', 'Total']
+        df = DataFrame(sorted(results, key=lambda x: x[-1], reverse=reverse), columns=columns)
+        df.to_csv(join(export, name), index=False)
     
     return best
-
