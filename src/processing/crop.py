@@ -1,4 +1,4 @@
-from cv2 import resize,fillPoly,bitwise_and
+from cv2 import resize,fillPoly,bitwise_and, imwrite
 from typing import Tuple,List
 from numpy import ndarray,uint8,int32,zeros,array
 from ultralytics import YOLO
@@ -8,6 +8,7 @@ import torch
 import torchvision
 from numpy import ndarray
 from typing import Union
+from os.path import join
 
 def GetModel(filePath:str = r"models\best.pt") -> YOLO | None:
     """
@@ -212,6 +213,13 @@ def SegmentedList(images:List[ndarray], model:YOLO, is_resized: bool = False, co
         
     return segmented
 
+
+def saveSeg(image,output,fname):
+    if imwrite(join(output,fname),image):    
+        print("salvei")
+    else:
+        print(image)
+
 if __name__ == "__main__":
     from cv2 import imread, imwrite
     
@@ -219,3 +227,5 @@ if __name__ == "__main__":
     model = YOLO(r"models\best.pt")
 
     result = Segment(image,model)
+    
+    saveSeg(result,"test","segmentou.jpg")
