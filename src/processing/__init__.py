@@ -6,3 +6,4 @@ sys.path.append(current_dir)
 
 from fetch import *
 from crop import *
+from valid import *

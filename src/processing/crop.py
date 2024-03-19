@@ -1,4 +1,4 @@
-from cv2 import resize,fillPoly,bitwise_and, imwrite
+from cv2 import resize,fillPoly,bitwise_and, imwrite, cvtColor, COLOR_RGB2BGR
 from typing import Tuple,List
 from numpy import ndarray,uint8,int32,zeros,array
 from ultralytics import YOLO
@@ -214,11 +214,16 @@ def SegmentedList(images:List[ndarray], model:YOLO, is_resized: bool = False, co
     return segmented
 
 
-def saveSeg(image,output,fname):
-    if imwrite(join(output,fname),image):    
-        print("salvei")
-    else:
-        print(image)
+def saveSeg(image: ndarray,output:str,fname:str,rgb: bool = True):
+    """
+    Salva uma imagem segmentada na diretorio passado
+    """
+    
+    if rgb:
+        image = cvtColor(image,COLOR_RGB2BGR)
+    
+    return imwrite(join(output,fname),image)   
+
 
 if __name__ == "__main__":
     from cv2 import imread, imwrite
