@@ -48,13 +48,13 @@ def ResizeList(images:List[ndarray], size:Tuple[int,int] = (640,640))-> List[nda
         
     return resized
 
-def Predict_image(image:str,modelsPath:str="best.pt",conf:float=0.5):
+def Predict_image(image,modelsPath:str="best.pt",conf:float=0.5):
         """
         Processa uma imagem e retorna um dicionário com os dados obtidos.
         O dicionário possui as seguintes chaves -> xyxys,confidences,class_id,masks,probs
         
         Args:
-            image::str: Nome de uma imagem processada para o recorte
+            image::str|ndarray: Nome de uma imagem processada para o recorte
             modelsPath::str: Caminho para o modelo YOLO salvado no formato .pt para segmentação
             confiance::float: Grau de confiança que a rede usará para decidir as zonas de recorte,
             o valor de confiança pode varia entre 0 e 1.
@@ -76,6 +76,7 @@ def Predict_image(image:str,modelsPath:str="best.pt",conf:float=0.5):
             dic['confidences'] = boxes.conf
             #dic['masks'] = (result.masks.xy,result.masks.data)
             dic['masks'] = result.masks.xy
+            print("MASCARAS->",dic['masks'])
             
         except:
             dic = None
@@ -96,7 +97,7 @@ def Segment(image: ndarray, model: YOLO, conf: float = 0.5) -> Union[ndarray, No
         segmentacao::ndarray: Imagem segmentada a ser retornada ou Nada caso não haja o que segmentar na imagem
     """
     # Realiza a predição do modelo na imagem
-    results = model.predict(source=image, boxes=False, conf=conf, max_det=1)
+    results = model.predict(source=image, boxes=False, conf=conf, max_det=2)
     
     segmentacao = None
     
@@ -111,17 +112,20 @@ def Segment(image: ndarray, model: YOLO, conf: float = 0.5) -> Union[ndarray, No
             # Obtém as coordenadas das máscaras
             xy = result.masks.xy
             
-            # Converter as coordenadas das máscaras para um único numpy.ndarray
-            xy_np = np.array(xy, dtype=np.float32)
+            # Concatenar todas as listas de coordenadas em uma única lista
+            xy_concatenated = [coord for mask in xy for coord in mask]
+
+            # Converter a lista de coordenadas em um array numpy
+            xy_np = np.array(xy_concatenated, dtype=np.float32)
 
             # Calcular as caixas delimitadoras a partir das coordenadas das máscaras
-            xmin = np.min(xy_np[:, :, 0], axis=1)
-            ymin = np.min(xy_np[:, :, 1], axis=1)
-            xmax = np.max(xy_np[:, :, 0], axis=1)
-            ymax = np.max(xy_np[:, :, 1], axis=1)
+            xmin = np.min(xy_np[:, 0])
+            ymin = np.min(xy_np[:, 1])
+            xmax = np.max(xy_np[:, 0])
+            ymax = np.max(xy_np[:, 1])
 
             # Criar as caixas delimitadoras no formato [xmin, ymin, xmax, ymax]
-            boxes = torch.tensor(np.stack([xmin, ymin, xmax, ymax], axis=1), dtype=torch.float32)
+            boxes = torch.tensor([[xmin, ymin, xmax, ymax]], dtype=torch.float32)
 
             # Ajustar o tamanho do tensor de pontuações (scores) para corresponder ao número de caixas detectadas
             scores = torch.zeros(boxes.shape[0], dtype=torch.float32)
@@ -143,7 +147,6 @@ def Segment(image: ndarray, model: YOLO, conf: float = 0.5) -> Union[ndarray, No
             # Aplicar a máscara na imagem original
             segmentacao = bitwise_and(image, image, mask=mask)
             
-        
     # Retorna None caso não haja detecções ou máscaras presentes na imagem
     return segmentacao
     """
@@ -213,8 +216,6 @@ if __name__ == "__main__":
     from cv2 import imread, imwrite
     
     image = imread(r"Dados\dados\img3_1.jpg")
-    model = YOLO("best.pt")
+    model = YOLO(r"models\best.pt")
 
     result = Segment(image,model)
-    print(result)
-    imwrite(r"test\segmentado.jpg",result)

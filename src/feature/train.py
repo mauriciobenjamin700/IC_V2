@@ -104,7 +104,7 @@ def save_results(
         match mode.lower():
             
             case  ".csv":
-                df.to_csv(join(path,name+mode))
+                df.to_csv(join(path,name+mode),index=False)
                 
             case ".json":
                 df.to_json(join(path,name+mode),indent=4)
