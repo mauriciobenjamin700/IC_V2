@@ -10,7 +10,7 @@ from numpy import ndarray
 from typing import Union
 from os.path import join
 
-def GetModel(filePath:str = r"models\best.pt") -> YOLO | None:
+def SegModel(filePath:str = r"models\best.pt") -> YOLO | None:
     """
     Recebe o caminho de um modelo YOLO e o retorna
     Caso falhe ao encontrar o modelo retorna None

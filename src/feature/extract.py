@@ -2,7 +2,7 @@ from numpy import ndarray, mean, median, std
 from typing import List
 from pandas import DataFrame
 
-def oneORmore(images:List[ndarray])->DataFrame:
+def Image2DF(images:List[ndarray])->DataFrame:
     """
     Extrai as caracteristica de uma lista de imagens contendo uma ou mais imagens 
     e arquiva os resultados em um DataFrame Pandas

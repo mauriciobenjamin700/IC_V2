@@ -374,7 +374,7 @@ def Best_rf(df: DataFrame, save_results: str = '', )->RF:
     return best
 
 
-def Save_model(model:RF, model_name:str)->None:
+def Save_Model_PKL(model:RF, model_name:str = "best")->None:
     """
     Salva um modelo RandomForestClassifer em um arquivo.pkl 
     

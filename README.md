@@ -14,6 +14,11 @@ O FAMACHA© é o método mais indicado para o controle seletivo em regiões onde
 
 Os cinco graus de coloração no cartão direcionam a vermifugação dos animais onde os graus 1 e 2 são de animais com coloração vermelho vivo, ou seja, sem traços de anemia. A partir do grau 3, já é indicada a vermifugação,que é imprescindível nos graus 4 e 5. Porém, quando a mucosa apresenta palidez intensa (grau 5) é recomendável que o animal tenha suporte com alimentação reforçada em proteínas (volumosa ou concentrada), ferro oral ou injetável e suplementos a base de aminoácidos, conforme a indicação da bula. Havendo condições (infraestrutura/Veterinários) a transfusão de sangue é recomendada. Animais com grau de anemia 5, só devem ser vermifugados quando o quadro de anemia estiver amenizado. Veja a imagem a baixo para entender mais sobre as cores e o cartão.
 
+## Dependencias do SO (Recomendo usar Ubuntu)
+```bash
+sudo apt update
+sudo apt install libgl1-mesa-glx ffmpeg libsm6 libxext6  -y
+```
 <!-- 
 ![Cartão FAMACHA](Extras/CartaoFAMACHA.jpeg) -->
 
