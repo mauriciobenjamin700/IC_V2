@@ -30,7 +30,7 @@ def GetModel(filePath:str = r"models\best.pt") -> YOLO | None:
         
     return model
 
-def ResizeList(images:List[ndarray], size:Tuple[int,int] = (640,640))-> List[ndarray]:
+def ResizeList(images:List[ndarray], size:Tuple[int,int] = (640,640))-> List[ndarray]: #(512,512), (256,256), (128,128), (64,64)
     """
     Redimensiona uma lista de imagens para a proporção desejada
     
@@ -188,7 +188,7 @@ def Segment(image:ndarray,model: YOLO):
 
     """
 
-def SegmentedList(images:List[ndarray], model:YOLO, is_resized: bool = False, conf: float = 0.5)->List[ndarray]:
+def SegmentedList(images:List[ndarray], model:YOLO, is_resized: bool = False, new_size: Tuple[float,float] = (512,512), conf: float = 0.5)->List[ndarray]:
     """
     Recebe uma lista de imagens e realizada a segmentação em cada uma das imagens.
     Caso a imagem seja uma imagem válida, retorna a zona de interesse obtida pela segmentação.
@@ -204,7 +204,7 @@ def SegmentedList(images:List[ndarray], model:YOLO, is_resized: bool = False, co
          
     """
     if is_resized == False:
-        images = ResizeList(images)
+        images = ResizeList(images,size=new_size)
     
     segmented = []
     
