@@ -47,10 +47,12 @@ def Folder(foldername:str="images")->Tuple[List[ndarray],List[str]]:
             
         for e in extensions:
             files.extend(glob(join(foldername,e)))
+            files.extend(glob(join(foldername,e.upper())))
 
         for file in files:
             images.append(Image(file))
             labels.append(basename(file))
+
     return (images,labels)
 
 
